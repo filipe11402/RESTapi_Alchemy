@@ -10,7 +10,7 @@ cursor.execute(create_users_query)
 
 
 #to create items table
-create_items_query = "CREATE TABLE IF NOT EXISTS items (name VARCHAR, price real)"
+create_items_query = "CREATE TABLE IF NOT EXISTS items (id INTEGER PRIMARY KEY, name VARCHAR, price real)"
 
 cursor.execute(create_items_query)
 connection.commit()

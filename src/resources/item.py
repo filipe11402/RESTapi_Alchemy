@@ -29,22 +29,20 @@ class Item(Resource):
         data = Item.parser.parse_args()
 
         item = ItemModel(name, data['price'])
-        item.insert()
+
+        try:
+            item.save_to_db()
+        except:
+            return {'message': 'Error while parsing data'}, 500
 
         return item.json(), 201
         
 
     def delete(self, name):
         item = ItemModel.find_by_name(name)
-        if not name:
-            return {'message': 'no item with that name'}, 401
-        connection = sqlite3.connect('data.db')
-        cursor = connection.cursor()
 
-        delete_query = "DELETE FROM items WHERE name=?"
-        result = cursor.execute(delete_query, (name,))
-        connection.commit()
-        connection.close
+        if item:
+            item.delete_from_db()
 
         return {'message': 'item was deleted successfully'}, 200
 
@@ -52,20 +50,16 @@ class Item(Resource):
     def put(self, name):
         data = Item.parser.parse_args()
         item = ItemModel.find_by_name(name)
-        updated_item = ItemModel(name, data['price'])
 
         if item:
-            try:
-                updated_item.update()
-            except:
-                return {'error': 'There was an error while trying to update'}, 500
+            item.price = data['price']
+            item.save_to_db()
         else:
-            try:
-                updated_item.insert()
-            except:
-                return {'error': 'There was an error while inserting'}, 500
+            item = ItemModel(name, data['price'])
+            item.save_to_db()
+
         
-        return updated_item.json(), 200
+        return item.json(), 200
 
             
              
